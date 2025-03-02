@@ -1,4 +1,3 @@
-
 import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
@@ -27,12 +26,22 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Authentication functions
-export const registerUser = (email: string, password: string) => {
-  return createUserWithEmailAndPassword(auth, email, password);
+export const registerUser = async (email: string, password: string) => {
+  try {
+    return await createUserWithEmailAndPassword(auth, email, password);
+  } catch (error: any) {
+    console.error("Firebase auth error:", error.code, error.message);
+    throw error;
+  }
 };
 
-export const loginUser = (email: string, password: string) => {
-  return signInWithEmailAndPassword(auth, email, password);
+export const loginUser = async (email: string, password: string) => {
+  try {
+    return await signInWithEmailAndPassword(auth, email, password);
+  } catch (error: any) {
+    console.error("Firebase login error:", error.code, error.message);
+    throw error;
+  }
 };
 
 export const logoutUser = () => {

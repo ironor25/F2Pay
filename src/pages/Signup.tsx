@@ -69,6 +69,8 @@ const Signup = () => {
         errorMessage = "Invalid email format. Please check your email.";
       } else if (error.code === "auth/weak-password") {
         errorMessage = "Password is too weak. Please use a stronger password.";
+      } else if (error.code === "auth/operation-not-allowed") {
+        errorMessage = "Email/password authentication is not enabled. Please contact the administrator.";
       }
       
       toast({
