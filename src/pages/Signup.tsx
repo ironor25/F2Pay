@@ -1,13 +1,15 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "@/lib/firebase";
+import { registerUser, saveFaceData } from "@/lib/firebase";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
-import { Fingerprint, Lock, Mail, User } from "lucide-react";
+import { Fingerprint, Lock, Mail, User, Camera, CheckCircle2 } from "lucide-react";
+import FaceScanner from "@/components/FaceScanner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -15,10 +17,22 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [faceData, setFaceData] = useState<string | null>(null);
+  const [faceRegistered, setFaceRegistered] = useState(false);
+  const [currentStep, setCurrentStep] = useState<"form" | "face">("form");
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCaptureFace = (capturedFaceData: string) => {
+    setFaceData(capturedFaceData);
+    setFaceRegistered(true);
+    toast({
+      title: "Face captured successfully",
+      description: "Your face has been registered for authentication",
+    });
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name || !email || !password || !confirmPassword) {
@@ -48,11 +62,19 @@ const Signup = () => {
       return;
     }
     
+    setCurrentStep("face");
+  };
+  
+  const handleSubmit = async () => {
     setLoading(true);
     
     try {
-      await registerUser(email, password);
-      // Could also save additional user information to Firestore here
+      const result = await registerUser(email, password);
+      
+      // If the user chose to register their face
+      if (faceData && result.user) {
+        await saveFaceData(result.user.uid, faceData);
+      }
       
       toast({
         title: "Account created",
@@ -102,106 +124,160 @@ const Signup = () => {
               </p>
             </div>
             
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-muted-foreground" />
+            {currentStep === "form" ? (
+              <form className="space-y-6" onSubmit={handleFormSubmit}>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      required
+                      className="pl-10"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your full name"
+                    />
                   </div>
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required
-                    className="pl-10"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your full name"
-                  />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-muted-foreground" />
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email address</Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      className="pl-10"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                    />
                   </div>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="pl-10"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                  />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-muted-foreground" />
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="new-password"
+                      required
+                      className="pl-10"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Create a password"
+                    />
                   </div>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    className="pl-10"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a password"
-                  />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-muted-foreground" />
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      autoComplete="new-password"
+                      required
+                      className="pl-10"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm your password"
+                    />
                   </div>
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    className="pl-10"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your password"
-                  />
                 </div>
-              </div>
-              
-              <Button
-                type="submit"
-                className="w-full py-6"
-                disabled={loading}
-              >
-                {loading ? "Creating account..." : "Create account"}
-              </Button>
-              
-              <div className="text-center mt-4">
-                <p className="text-sm text-muted-foreground">
-                  Already have an account?{" "}
-                  <Link
-                    to="/login"
-                    className="font-medium text-primary hover:text-primary/80"
+                
+                <Button
+                  type="submit"
+                  className="w-full py-6"
+                >
+                  Continue to Face Registration
+                </Button>
+                
+                <div className="text-center mt-4">
+                  <p className="text-sm text-muted-foreground">
+                    Already have an account?{" "}
+                    <Link
+                      to="/login"
+                      className="font-medium text-primary hover:text-primary/80"
+                    >
+                      Sign in
+                    </Link>
+                  </p>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-6">
+                <div className="space-y-2 text-center">
+                  <h3 className="text-xl font-medium">Register Your Face</h3>
+                  <p className="text-sm text-muted-foreground">
+                    This will allow you to login using facial recognition
+                  </p>
+                </div>
+                
+                {faceRegistered ? (
+                  <div className="flex flex-col items-center space-y-4 p-4">
+                    <div className="bg-green-100 p-4 rounded-full">
+                      <CheckCircle2 className="h-16 w-16 text-green-600" />
+                    </div>
+                    <p className="text-center font-medium">Face successfully registered!</p>
+                  </div>
+                ) : (
+                  <FaceScanner onCapture={handleCaptureFace} actionText="Capture Face" />
+                )}
+                
+                <div className="flex space-x-3">
+                  <Button
+                    variant="outline"
+                    className="w-1/2"
+                    onClick={() => setCurrentStep("form")}
+                    disabled={loading}
                   >
-                    Sign in
-                  </Link>
-                </p>
+                    Back
+                  </Button>
+                  <Button
+                    type="button"
+                    className="w-1/2 py-6"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                  >
+                    {loading ? "Creating account..." : "Create account"}
+                  </Button>
+                </div>
+                
+                {!faceRegistered && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    You can also{" "}
+                    <button 
+                      type="button"
+                      onClick={handleSubmit}
+                      className="text-primary hover:text-primary/80 font-medium"
+                    >
+                      skip this step
+                    </button>{" "}
+                    and add it later
+                  </p>
+                )}
               </div>
-            </form>
+            )}
           </div>
         </div>
       </div>
