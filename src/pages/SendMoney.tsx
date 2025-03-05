@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Fingerprint, SendHorizontal, User, DollarSign } from "lucide-react";
+import { useAuth } from "@/context/FingAuthContext";
 
 const SendMoney = () => {
   const [recipient, setRecipient] = useState("");
@@ -16,52 +17,25 @@ const SendMoney = () => {
   const [verificationStep, setVerificationStep] = useState<"initial" | "fingerprint" | "face" | "success">("initial");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const { user, verifyFingerprint } = useAuth();
 
-  const handleInitialSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!recipient || !amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      toast({
-        title: "Invalid input",
-        description: "Please enter a valid recipient and amount",
-        variant: "destructive",
-      });
-      return;
+    try {
+      const verified = await verifyFingerprint();
+      if (verified) {
+        navigate('/payment-success');
+      } else {
+        setError('Fingerprint verification failed. Please try again.');
+      }
+    } catch (err) {
+      setError('Payment failed. Please try again.');
     }
-    
-    // Move to fingerprint verification
-    setVerificationStep("fingerprint");
   };
 
-  const handleFingerprintVerification = () => {
-    // In a real app, this would trigger biometric verification
-    setLoading(true);
-    
-    // Simulate verification process
-    setTimeout(() => {
-      setLoading(false);
-      setVerificationStep("face");
-      toast({
-        title: "Fingerprint verified",
-        description: "Your fingerprint has been successfully verified",
-      });
-    }, 2000);
-  };
 
-  const handleFaceVerification = () => {
-    // In a real app, this would trigger facial recognition
-    setLoading(true);
-    
-    // Simulate verification process
-    setTimeout(() => {
-      setLoading(false);
-      setVerificationStep("success");
-      toast({
-        title: "Face recognized",
-        description: "Your face has been successfully verified",
-      });
-    }, 2000);
-  };
+  
 
   const handleBackToHome = () => {
     navigate("/");
@@ -78,7 +52,7 @@ const SendMoney = () => {
                 Enter recipient details and amount to begin the secure transfer
               </CardDescription>
             </CardHeader>
-            <form onSubmit={handleInitialSubmit}>
+            <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="recipient">Recipient Email or ID</Label>
@@ -118,7 +92,7 @@ const SendMoney = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full">Continue</Button>
+                <Button type="submit" className="w-full"> Verify and Pay</Button>
               </CardFooter>
             </form>
           </Card>
@@ -143,7 +117,7 @@ const SendMoney = () => {
             </CardContent>
             <CardFooter className="flex flex-col space-y-2">
               <Button
-                onClick={handleFingerprintVerification}
+            
                 disabled={loading}
                 className="w-full"
               >
@@ -183,7 +157,7 @@ const SendMoney = () => {
             </CardContent>
             <CardFooter className="flex flex-col space-y-2">
               <Button
-                onClick={handleFaceVerification}
+         
                 disabled={loading}
                 className="w-full"
               >

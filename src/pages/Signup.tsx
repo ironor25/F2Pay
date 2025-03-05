@@ -8,8 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
 import { Fingerprint, Lock, Mail, User, Camera, CheckCircle2 } from "lucide-react";
-import FaceScanner from "@/components/FaceScanner";
+import { useAuth } from "@/context/FingAuthContext";
+// import FaceScanner from "@/components/FaceScanner";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FaceRecognition from "@/components/F_recognition";
+import CaptureImage from "@/components/CaptureImage";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -22,6 +26,8 @@ const Signup = () => {
   const [currentStep, setCurrentStep] = useState<"form" | "face">("form");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { register, createPasskey } = useAuth();
+  const [error, setError] = useState('');
 
   const handleCaptureFace = (capturedFaceData: string) => {
     setFaceData(capturedFaceData);
@@ -102,6 +108,16 @@ const Signup = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePasskeyCreation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createPasskey(email);
+ 
+    } catch (err) {
+      setError('Failed to create passkey. Please try again.');
     }
   };
 
@@ -204,6 +220,12 @@ const Signup = () => {
                     />
                   </div>
                 </div>
+                <Button
+                  onClick={handlePasskeyCreation}
+                  className="w-full py-6"
+                >
+                  Setup Fingerprint
+                </Button>
                 
                 <Button
                   type="submit"
@@ -241,7 +263,8 @@ const Signup = () => {
                     <p className="text-center font-medium">Face successfully registered!</p>
                   </div>
                 ) : (
-                  <FaceScanner onCapture={handleCaptureFace} actionText="Capture Face" />
+                  // <FaceScanner onCapture={handleCaptureFace} actionText="Capture Face" />
+                  <CaptureImage username= {name}/>
                 )}
                 
                 <div className="flex space-x-3">

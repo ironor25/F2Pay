@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
 import { Fingerprint, Lock, Mail, ScanFace } from "lucide-react";
-import FaceScanner from "@/components/FaceScanner";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import FaceRecognition from "@/components/F_recognition";
+
 
 interface LocationState {
   from?: string;
@@ -217,40 +219,40 @@ const Login = () => {
               
               <TabsContent value="face">
                 <div className="space-y-6">
-                  {!faceScanStarted ? (
+                  {!faceScanStarted &&
+                  
+                    //   {/* <div className="space-y-2">
+                    //     <Label htmlFor="faceEmail">Email address</Label>
+                    //     <div className="relative">
+                    //       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    //         <Mail className="h-5 w-5 text-muted-foreground" />
+                    //       </div>
+                    //       <Input
+                    //         id="faceEmail"
+                    //         name="faceEmail"
+                    //         type="email"
+                    //         autoComplete="email"
+                    //         required
+                    //         className="pl-10"
+                    //         value={faceEmail}
+                    //         onChange={(e) => setFaceEmail(e.target.value)}
+                    //         placeholder="Enter your email"
+                    //       />
+                    //     </div>
+                    //   </div>
+                    //    */}
+                    //   {/* <Button
+                    //     onClick={handleFaceLogin}
+                    //     className="w-full py-6"
+                    //     disabled={loading}
+                    //   >
+                    //     <ScanFace className="mr-2 h-4 w-4" />
+                    //     Proceed to Face Scan
+                    //   </Button>
+                    // </> */}
+                   (
                     <>
-                      <div className="space-y-2">
-                        <Label htmlFor="faceEmail">Email address</Label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Mail className="h-5 w-5 text-muted-foreground" />
-                          </div>
-                          <Input
-                            id="faceEmail"
-                            name="faceEmail"
-                            type="email"
-                            autoComplete="email"
-                            required
-                            className="pl-10"
-                            value={faceEmail}
-                            onChange={(e) => setFaceEmail(e.target.value)}
-                            placeholder="Enter your email"
-                          />
-                        </div>
-                      </div>
-                      
-                      <Button
-                        onClick={handleFaceLogin}
-                        className="w-full py-6"
-                        disabled={loading}
-                      >
-                        <ScanFace className="mr-2 h-4 w-4" />
-                        Proceed to Face Scan
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="space-y-2 text-center">
+                      {/* <div className="space-y-2 text-center">
                         <h3 className="text-xl font-medium">Face Authentication</h3>
                         <p className="text-sm text-muted-foreground">
                           Look at the camera for verification
@@ -269,7 +271,8 @@ const Login = () => {
                         disabled={loading}
                       >
                         Cancel
-                      </Button>
+                      </Button> */}
+                      <FaceRecognition/>
                     </>
                   )}
                 </div>

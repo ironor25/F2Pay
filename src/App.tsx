@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
-import AuthGuard from "@/components/AuthGuard";
+
 
 // Pages
 import Index from "./pages/Index";
@@ -13,12 +13,15 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import SendMoney from "./pages/SendMoney";
 import NotFound from "./pages/NotFound";
+import { FingAuthProvider } from "./context/FingAuthContext";
+import PaymentSuccess from './pages/PaymentSuccess';
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
+    <FingAuthProvider>
+          <AuthProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -29,17 +32,15 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route 
               path="/send-money" 
-              element={
-                <AuthGuard>
-                  <SendMoney />
-                </AuthGuard>
-              } 
-            />
+              element={ <SendMoney />} />
+               <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
+    </FingAuthProvider>
+
   </QueryClientProvider>
 );
 
