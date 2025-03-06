@@ -26,7 +26,10 @@ node server.js
 cd frontend
 npm run dev  
 ```
-
+## Github repo link 
+```sh  
+https://github.com/ironor25/F2Pay.git
+```
 ## Requirements  
 - Ensure your **webcam** is enabled and accessible for face recognition.  
 - Make sure your **fingerprint scanner** is connected and recognized by Windows.  
