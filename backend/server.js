@@ -11,7 +11,7 @@ app.post("/upload", (req, res) => {
   const { image, username } = req.body;
   if (!image || !username) return res.status(400).send("Missing data");
 
-  const userFolder = path.join(__dirname,".." ,"frontend/public/labels", username);
+  const userFolder = path.join(__dirname,".." ,"/frontend/public/labels", username);
   console.log(userFolder)
   // Ensure directory exists
   if (!fs.existsSync(userFolder)) {
@@ -32,7 +32,7 @@ app.post("/upload", (req, res) => {
 });
 
 app.get("/folders", (req, res) => {
-  const directoryPath = path.join(__dirname, "../public/labels"); // Change to your directory
+  const directoryPath = path.join(__dirname, "../frontend/public/labels"); // Change to your directory
 
   fs.readdir(directoryPath, { withFileTypes: true }, (err, files) => {
     if (err) return res.status(500).json({ error: err.message });

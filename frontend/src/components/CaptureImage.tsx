@@ -49,6 +49,7 @@ const Camera = ({username}) => {
           transform: 'scaleX(-1)'
         }} />
       <Button onClick={captureImage}>Capture</Button>
+      <span className="text-yellow-500">  Capture at least 2 photos</span>
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   );
