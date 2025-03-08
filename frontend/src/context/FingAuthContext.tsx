@@ -15,7 +15,7 @@ interface AuthContextType {
   verifyFingerprint: () => Promise<boolean>;
   logout: () => void;
 }
-
+ 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {

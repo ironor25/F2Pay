@@ -19,7 +19,7 @@ const FaceRecognition = () => {
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const labels = ['Deepak', 'Messi'];
+  const labels = folders;
   useEffect(() => {
     const loadModels = async () => {
       await Promise.all([
@@ -61,7 +61,7 @@ const FaceRecognition = () => {
   };
 
   const getLabeledFaceDescriptions = async () => {
-    const labels = folders
+
     try {
       return Promise.all(
         labels.map(async (label) => {
@@ -134,9 +134,11 @@ const FaceRecognition = () => {
           });
 
           for (const result of results) {
-            const detectedLabel = result.toString().split(' ')[0];
-            const distance = parseFloat(result.toString().split(' ')[1]);
+            console.log(result.toString())
+            const detectedLabel = result.toString().split(' ')[0]+" "+result.toString().split(' ')[1];
+            const distance = parseFloat(result.toString().split(' ')[2]);
             console.log('Detected Person:', detectedLabel, 'Distance:', distance);
+            
             if (videoRef.current?.srcObject) {
               const tracks = videoRef.current.srcObject.getTracks();
               tracks.forEach(track => track.stop());
@@ -146,14 +148,11 @@ const FaceRecognition = () => {
             if (labels.includes(detectedLabel)) {
               console.log('Match found! Redirecting...');
               clearInterval(recognitionInterval);
+              navigate('/send-money');
              
               
-              if (videoRef.current?.srcObject) {
-                const tracks = videoRef.current.srcObject.getTracks();
-                tracks.forEach(track => track.stop());
-              }
-
-              navigate('/send-money');
+       
+              
               return;
             }
           }
