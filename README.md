@@ -3,6 +3,10 @@
 ## Description  
 F2PAY is a secure authentication system that utilizes **face recognition** for login and **fingerprint scanning** for payment transactions, implementing a **two-factor authentication (2FA)** mechanism for enhanced security.  
 
+## Demo Video
+
+[![Watch the video](https://img.youtube.com/vi/1AEYe86oU9w/0.jpg)](https://www.youtube.com/watch?v=1AEYe86oU9w)
+
 ## Installation  
 
 ### For Server  
